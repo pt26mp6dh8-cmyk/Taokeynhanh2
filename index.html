@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Key Generator - Tạo Key Random</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 30px 15px;
+    color: #fff;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 850px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, #00d4ff, #a855f7, #ff6b6b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 13px;
+    opacity: 0.7;
+    margin-bottom: 25px;
+  }
+
+  .form-group {
+    margin-bottom: 18px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0.9;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 13px 15px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    transition: 0.3s;
+  }
+
+  input:focus, select:focus {
+    border-color: #00d4ff;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+  }
+
+  select option { background: #1e3c72; color: #fff; }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+  .btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #00d4ff, #a855f7);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+    letter-spacing: 1px;
+    margin-top: 5px;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 212, 255, 0.4);
+  }
+
+  .btn:active { transform: translateY(0); }
+
+  .btn-clear {
+    background: linear-gradient(90deg, #ff416c, #ff4b2b);
+    margin-top: 10px;
+  }
+
+  .result-box {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px dashed rgba(0, 212, 255, 0.5);
+    display: none;
+  }
+
+  .result-box.show { display: block; animation: fadeIn 0.4s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .key-display {
+    font-family: 'Courier New', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: #00ff88;
+    text-align: center;
+    padding: 15px;
+    background: rgba(0, 255, 136, 0.08);
+    border-radius: 8px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    word-break: break-all;
+    cursor: pointer;
+    user-select: all;
+  }
+
+  .info {
+    text-align: center;
+    font-size: 13px;
+    opacity: 0.85;
+    margin-top: 5px;
+  }
+
+  h2 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .key-list { list-style: none; max-height: 400px; overflow-y: auto; }
+
+  .key-list::-webkit-scrollbar { width: 6px; }
+  .key-list::-webkit-scrollbar-thumb {
+    background: rgba(0, 212, 255, 0.5);
+    border-radius: 10px;
+  }
+
+  .key-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.06);
+    border-left: 4px solid #00ff88;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    gap: 10px;
+    flex-wrap: wrap;
+    transition: 0.3s;
+  }
+
+  .key-item:hover { background: rgba(255, 255, 255, 0.12); }
+
+  .key-item.expired {
+    border-left-color: #ff4b2b;
+    opacity: 0.55;
+  }
+
+  .key-code {
+    font-family: 'Courier New', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    color: #00d4ff;
+    flex: 1;
+    min-width: 200px;
+    word-break: break-all;
+  }
+
+  .key-item.expired .key-code { color: #ff4b2b; text-decoration: line-through; }
+
+  .key-meta {
+    font-size: 12px;
+    opacity: 0.8;
+    text-align: right;
+    min-width: 160px;
+  }
+
+  .countdown { color: #00ff88; font-weight: 700; }
+  .key-item.expired .countdown { color: #ff4b2b; }
+
+  .mini-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    border: none;
+    border-radius: 6px;
+    background: rgba(0, 212, 255, 0.2);
+    color: #00d4ff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+  }
+
+  .mini-btn:hover { background: rgba(0, 212, 255, 0.4); }
+
+  .mini-btn.delete {
+    background: rgba(255, 75, 43, 0.2);
+    color: #ff6b6b;
+  }
+
+  .mini-btn.delete:hover { background: rgba(255, 75, 43, 0.4); }
+
+  .empty {
+    text-align: center;
+    opacity: 0.5;
+    padding: 20px;
+    font-size: 14px;
+    font-style: italic;
+  }
+
+  @media (max-width: 600px) {
+    .row { grid-template-columns: 1fr; }
+    .container { padding: 20px; }
+    h1 { font-size: 22px; }
+    .key-display { font-size: 16px; }
+    .key-meta { text-align: left; min-width: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🔑 KEY GENERATOR</h1>
+  <p class="subtitle">Tạo key random với thời hạn tùy chọn</p>
+
+  <div class="form-group">
+    <label>⏱️ Chọn thời hạn (giờ)</label>
+    <div class="row">
+      <select id="hoursSelect">
+        <option value="1">1 giờ</option>
+        <option value="6">6 giờ</option>
+        <option value="12">12 giờ</option>
+        <option value="24" selected>1 ngày (24 giờ)</option>
+        <option value="72">3 ngày (72 giờ)</option>
+        <option value="168">7 ngày (168 giờ)</option>
+        <option value="720">30 ngày (720 giờ)</option>
+        <option value="custom">Tùy chỉnh...</option>
+      </select>
+      <input type="number" id="customHours" placeholder="Nhập số giờ..." min="1" style="display:none;">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="form-group">
+      <label>🔤 Độ dài key</label>
+      <select id="keyLength">
+        <option value="16">16 ký tự</option>
+        <option value="20" selected>20 ký tự</option>
+        <option value="25">25 ký tự</option>
+        <option value="32">32 ký tự</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>✂️ Định dạng</label>
+      <select id="keyFormat">
+        <option value="dash" selected>XXXX-XXXX-XXXX-XXXX</option>
+        <option value="plain">XXXXXXXXXXXXXX</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="btn" onclick="generateKey()">⚡ TẠO KEY NGAY</button>
+
+  <div class="result-box" id="resultBox">
+    <div class="key-display" id="keyDisplay" onclick="copyKey(this)"></div>
+    <p class="info" id="keyInfo"></p>
+    <p class="info" style="margin-top:8px; font-size:12px;">👆 Click vào key để copy</p>
+  </div>
+
+  <h2>📋 Danh sách key đã tạo</h2>
+  <ul class="key-list" id="keyList"></ul>
+  <button class="btn btn-clear" onclick="clearAll()">🗑️ XÓA TẤT CẢ</button>
+</div>
+
+<script>
+  const STORAGE_KEY = 'generated_keys_v1';
+  let keys = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+  // Hiện/ẩn input custom
+  const hoursSelect = document.getElementById('hoursSelect');
+  const customHours = document.getElementById('customHours');
+  hoursSelect.addEventListener('change', () => {
+    customHours.style.display = hoursSelect.value === 'custom' ? 'block' : 'none';
+    if (hoursSelect.value === 'custom') customHours.focus();
+  });
+
+  // Tạo chuỗi random
+  function randomString(length) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    const array = new Uint32Array(length);
+    crypto.getRandomValues(array);
+    for (let i = 0; i < length; i++) {
+      result += chars[array[i] % chars.length];
+    }
+    return result;
+  }
+
+  // Format key thành dạng có dấu gạch
+  function formatKey(raw, format) {
+    if (format === 'plain') return raw;
+    return raw.match(/.{1,4}/g).join('-');
+  }
+
+  // Tạo key
+  function generateKey() {
+    let hours;
+    if (hoursSelect.value === 'custom') {
+      hours = parseFloat(customHours.value);
+      if (!hours || hours <= 0) {
+        alert('⚠️ Vui lòng nhập số giờ hợp lệ (> 0)');
+        customHours.focus();
+        return;
+      }
+    } else {
+      hours = parseFloat(hoursSelect.value);
+    }
+
+    const length = parseInt(document.getElementById('keyLength').value);
+    const format = document.getElementById('keyFormat').value;
+
+    const raw = randomString(length);
+    const keyCode = formatKey(raw, format);
+
+    const now = Date.now();
+    const expiresAt = now + hours * 3600 * 1000;
+
+    const keyObj = {
+      id: now + Math.random().toString(36).slice(2, 7),
+      code: keyCode,
+      hours: hours,
+      createdAt: now,
+      expiresAt: expiresAt
+    };
+
+    keys.unshift(keyObj);
+    save();
+
+    // Hiển thị kết quả
+    const box = document.getElementById('resultBox');
+    document.getElementById('keyDisplay').textContent = keyCode;
+    document.getElementById('keyInfo').innerHTML =
+      `⏳ Hiệu lực: <b>${formatHours(hours)}</b> | Hết hạn: <b>${formatDate(expiresAt)}</b>`;
+    box.classList.add('show');
+
+    renderList();
+  }
+
+  // Format giờ
+  function formatHours(h) {
+    if (h < 24) return `${h} giờ`;
+    const days = h / 24;
+    return Number.isInteger(days) ? `${days} ngày (${h}h)` : `${h} giờ`;
+  }
+
+  // Format ngày
+  function formatDate(ts) {
+    const d = new Date(ts);
+    const pad = n => String(n).padStart(2, '0');
+    return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+
+  // Đếm ngược
+  function countdown(expiresAt) {
+    const diff = expiresAt - Date.now();
+    if (diff <= 0) return { text: 'ĐÃ HẾT HẠN', expired: true };
+
+    const totalSec = Math.floor(diff / 1000);
+    const days = Math.floor(totalSec / 86400);
+    const hours = Math.floor((totalSec % 86400) / 3600);
+    const mins = Math.floor((totalSec % 3600) / 60);
+    const secs = totalSec % 60;
+
+    let text = '';
+    if (days > 0) text += `${days}d `;
+    text += `${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+
+    return { text: '⏳ ' + text, expired: false };
+  }
+
+  // Render danh sách
+  function renderList() {
+    const list = document.getElementById('keyList');
+    if (keys.length === 0) {
+      list.innerHTML = '<li class="empty">Chưa có key nào được tạo</li>';
+      return;
+    }
+
+    list.innerHTML = keys.map(k => {
+      const cd = countdown(k.expiresAt);
+      return `
+        <li class="key-item ${cd.expired ? 'expired' : ''}">
+          <div class="key-code">${k.code}</div>
+          <div class="key-meta">
+            <div class="countdown">${cd.text}</div>
+            <div style="opacity:0.7; margin-top:3px;">Hết hạn: ${formatDate(k.expiresAt)}</div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="mini-btn" onclick="copyText('${k.code}')">📋 Copy</button>
+            <button class="mini-btn delete" onclick="deleteKey('${k.id}')">✖</button>
+          </div>
+        </li>
+      `;
+    }).join('');
+  }
+
+  // Copy
+  function copyKey(el) {
+    copyText(el.textContent);
+  }
+
+  function copyText(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('✅ Đã copy: ' + text);
+    }).catch(() => {
+      alert('Không thể copy, hãy copy thủ công: ' + text);
+    });
+  }
+
+  // Toast đơn giản
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = `
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(90deg, #00d4ff, #a855f7);
+      padding: 12px 24px; border-radius: 10px; font-weight: 700;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 999;
+      animation: fadeIn 0.3s ease;
+    `;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 1800);
+  }
+
+  // Xóa 1 key
+  function deleteKey(id) {
+    if (!confirm('Xóa key này?')) return;
+    keys = keys.filter(k => k.id !== id);
+    save();
+    renderList();
+  }
+
+  // Xóa tất cả
+  function clearAll() {
+    if (keys.length === 0) return;
+    if (!confirm('Xóa tất cả key? Hành động không thể hoàn tác!')) return;
+    keys = [];
+    save();
+    renderList();
+    document.getElementById('resultBox').classList.remove('show');
+  }
+
+  // Lưu localStorage
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(keys));
+  }
+
+  // Init
+  renderList();
+  setInterval(renderList, 1000); // Cập nhật countdown mỗi giây
+</script>
+
+</body>
+</html>
